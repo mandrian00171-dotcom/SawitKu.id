@@ -1,619 +1,954 @@
 <!DOCTYPE html>
-<html lang="id">
+<html lang="id" class="h-full bg-slate-50">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>SawitKu.id - Catatan & Kalkulator Panen Sawit</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-  <style>
-    .bg-sawit-dark { background-color: #1b4332; }
-    .bg-sawit-green { background-color: #2d6a4f; }
-    .text-sawit-green { color: #2d6a4f; }
-    .border-sawit-green { border-color: #2d6a4f; }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SawitKu.Id - Sistem Manajemen Perkebunan Kelapa Sawit</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        sawit: {
+                            50: '#f0fdf4',
+                            100: '#dcfce7',
+                            500: '#22c55e',
+                            600: '#16a34a',
+                            700: '#15803d',
+                            800: '#166534',
+                            900: '#14532d',
+                            dark: '#0f381e'
+                        },
+                        palm: {
+                            gold: '#eab308',
+                            brown: '#854d0e'
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        /* Custom CSS untuk scrollbar dan efek halus */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #16a34a;
+            border-radius: 4px;
+        }
+        .active-tab {
+            border-bottom: 3px solid #16a34a;
+            color: #16a34a;
+            font-weight: 600;
+        }
+    </style>
 </head>
-<body class="bg-gray-100 text-gray-800 font-sans min-h-screen flex flex-col">
+<body class="h-full font-sans text-slate-800 flex flex-col justify-between">
 
-  <!-- NAVBAR -->
-  <nav class="bg-sawit-dark text-white shadow-md sticky top-0 z-50">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-      <div class="flex items-center justify-between h-16">
-        <div class="flex items-center space-x-3">
-          <i class="fa-solid fa-tree text-green-400 text-2xl"></i>
-          <span class="font-bold text-xl tracking-wider">SawitKu<span class="text-green-400">.id</span></span>
-        </div>
-        
-        <div id="navUser" class="hidden flex items-center space-x-4">
-          <span id="userDisplayName" class="text-sm font-medium bg-sawit-green px-3 py-1 rounded-full"></span>
-          <button onclick="logout()" class="text-xs bg-red-600 hover:bg-red-700 px-3 py-1.5 rounded-lg transition duration-200">
-            <i class="fa-solid fa-right-from-bracket mr-1"></i> Keluar
-          </button>
-        </div>
-      </div>
-    </div>
-  </nav>
+    <!-- HEADER / NAVIGATION BAR -->
+    <header class="bg-sawit-dark text-white shadow-lg sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16 items-center">
+                
+                <!-- LOGO SAWITKU.ID -->
+                <div class="flex items-center space-x-3 cursor-pointer" onclick="switchTab('dashboard')">
+                    <div class="w-10 h-10 bg-sawit-600 rounded-full flex items-center justify-center p-1.5 shadow-md">
+                        <!-- SVG Logo Pohon Sawit -->
+                        <svg viewBox="0 0 100 100" class="w-full h-full fill-current text-white" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M50 90 L50 45 C48 45 42 55 25 58 C23 58 35 45 45 38 C30 35 15 42 10 40 C20 33 38 32 46 32 C35 23 20 25 15 20 C30 18 42 24 48 28 C45 18 38 8 35 2 C44 10 48 20 50 26 C52 20 56 10 65 2 C62 8 55 18 52 28 C58 24 70 18 85 20 C80 25 65 23 54 32 C62 32 80 33 90 40 C85 42 70 35 55 38 C65 45 77 58 75 58 C58 55 52 45 50 45 Z" />
+                            <circle cx="45" cy="48" r="4" fill="#eab308" />
+                            <circle cx="55" cy="48" r="4" fill="#eab308" />
+                            <circle cx="50" cy="52" r="4.5" fill="#eab308" />
+                            <rect x="46" y="55" width="8" height="35" rx="3" fill="#854d0e" />
+                        </svg>
+                    </div>
+                    <div>
+                        <span class="text-xl font-bold tracking-wide text-white">SawitKu<span class="text-yellow-400">.Id</span></span>
+                        <p class="text-[10px] text-sawit-100 tracking-wider -mt-1 hidden sm:block">Sistem Kelola Sawit Digital</p>
+                    </div>
+                </div>
 
-  <!-- MAIN CONTAINER -->
-  <main class="flex-grow max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-6">
+                <!-- DESKTOP MENU -->
+                <nav class="hidden md:flex space-x-1 lg:space-x-4">
+                    <button id="nav-dashboard" onclick="switchTab('dashboard')" class="px-3 py-2 text-sm font-medium hover:text-yellow-400 transition">
+                        <i class="fa-solid fa-chart-pie mr-1.5"></i>Dashboard
+                    </button>
+                    <button id="nav-panen" onclick="switchTab('panen')" class="px-3 py-2 text-sm font-medium hover:text-yellow-400 transition">
+                        <i class="fa-solid fa-wheat-awn mr-1.5"></i>Catatan Panen
+                    </button>
+                    <button id="nav-perawatan" onclick="switchTab('perawatan')" class="px-3 py-2 text-sm font-medium hover:text-yellow-400 transition">
+                        <i class="fa-solid fa-hand-holding-droplet mr-1.5"></i>Perawatan Sawit
+                    </button>
+                </nav>
 
-    <!-- SEKSI AUTH (REGISTRASI / LOGIN) -->
-    <section id="authSection" class="max-w-md mx-auto my-8">
-      <div class="bg-white p-6 sm:p-8 rounded-2xl shadow-xl border border-gray-100">
-        
-        <!-- Tab Switcher -->
-        <div class="flex border-b border-gray-200 mb-6">
-          <button id="tabRegisterBtn" onclick="switchAuthTab('register')" class="w-1/2 py-2 text-center font-semibold text-sawit-green border-b-2 border-sawit-green focus:outline-none">
-            Daftar Akun
-          </button>
-          <button id="tabLoginBtn" onclick="switchAuthTab('login')" class="w-1/2 py-2 text-center font-semibold text-gray-400 border-b-2 border-transparent hover:text-sawit-green focus:outline-none">
-            Masuk
-          </button>
-        </div>
+                <!-- USER ACCOUNT PROFILE / LOGIN BUTTON -->
+                <div class="hidden md:flex items-center space-x-3">
+                    <div id="user-profile-badge" class="hidden flex items-center bg-sawit-800 text-xs px-3 py-1.5 rounded-full border border-sawit-600">
+                        <i class="fa-solid fa-user-check text-yellow-400 mr-2"></i>
+                        <div>
+                            <p id="user-display-name" class="font-semibold text-white leading-none">Petani Sawit</p>
+                            <p id="user-display-group" class="text-[10px] text-sawit-100">Kelompok Tani -</p>
+                        </div>
+                    </div>
+                    <button id="btn-show-auth" onclick="switchTab('auth')" class="bg-sawit-600 hover:bg-sawit-500 text-white text-xs px-3.5 py-2 rounded-lg font-medium shadow transition">
+                        <i class="fa-solid fa-user-plus mr-1"></i> Akun / Reg
+                    </button>
+                </div>
 
-        <!-- Form Registrasi -->
-        <form id="registerForm" onsubmit="handleRegister(event)" class="space-y-4">
-          <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1">Nama Lengkap Petani</label>
-            <input type="text" id="regName" required class="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-green-500 focus:outline-none" placeholder="Contoh: Budi Santoso" />
-          </div>
-          <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1">Nama Kelompok Tani</label>
-            <input type="text" id="regPoktan" required class="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-green-500 focus:outline-none" placeholder="Contoh: Poktan Sinar Tani" />
-          </div>
-          <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1">Nomor HP / WhatsApp</label>
-            <input type="tel" id="regPhone" required class="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-green-500 focus:outline-none" placeholder="08123456789" />
-          </div>
-          <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1">Kata Sandi</label>
-            <input type="password" id="regPass" required class="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-green-500 focus:outline-none" placeholder="••••••••" />
-          </div>
-          <button type="submit" class="w-full bg-sawit-green hover:bg-green-800 text-white font-semibold py-2.5 rounded-lg shadow-md transition duration-200">
-            Daftar Sekarang
-          </button>
-        </form>
-
-        <!-- Form Login -->
-        <form id="loginForm" onsubmit="handleLogin(event)" class="space-y-4 hidden">
-          <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1">Nomor HP</label>
-            <input type="tel" id="loginPhone" required class="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-green-500 focus:outline-none" placeholder="08123456789" />
-          </div>
-          <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1">Kata Sandi</label>
-            <input type="password" id="loginPass" required class="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-green-500 focus:outline-none" placeholder="••••••••" />
-          </div>
-          <button type="submit" class="w-full bg-sawit-green hover:bg-green-800 text-white font-semibold py-2.5 rounded-lg shadow-md transition duration-200">
-            Masuk ke Aplikasi
-          </button>
-        </form>
-
-      </div>
-    </section>
-
-    <!-- DASHBOARD KONTEN (TAMPIL SETELAH LOGIN) -->
-    <div id="dashboardSection" class="hidden space-y-6">
-      
-      <!-- Summary Cards -->
-      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <div class="bg-white p-5 rounded-xl shadow-sm border border-gray-100 flex items-center space-x-4">
-          <div class="p-3 bg-green-100 text-green-700 rounded-lg">
-            <i class="fa-solid fa-weight-hanging text-2xl"></i>
-          </div>
-          <div>
-            <p class="text-xs text-gray-500 uppercase tracking-wider font-semibold">Total Panen</p>
-            <h3 id="statTotalWeight" class="text-xl font-bold text-gray-800">0 Kg</h3>
-          </div>
-        </div>
-
-        <div class="bg-white p-5 rounded-xl shadow-sm border border-gray-100 flex items-center space-x-4">
-          <div class="p-3 bg-emerald-100 text-emerald-700 rounded-lg">
-            <i class="fa-solid fa-money-bill-wave text-2xl"></i>
-          </div>
-          <div>
-            <p class="text-xs text-gray-500 uppercase tracking-wider font-semibold">Total Pendapatan</p>
-            <h3 id="statTotalIncome" class="text-xl font-bold text-gray-800">Rp 0</h3>
-          </div>
-        </div>
-
-        <div class="bg-white p-5 rounded-xl shadow-sm border border-gray-100 flex items-center space-x-4">
-          <div class="p-3 bg-amber-100 text-amber-700 rounded-lg">
-            <i class="fa-solid fa-screwdriver-wrench text-2xl"></i>
-          </div>
-          <div>
-            <p class="text-xs text-gray-500 uppercase tracking-wider font-semibold">Total Biaya Perawatan</p>
-            <h3 id="statTotalMaintenance" class="text-xl font-bold text-gray-800">Rp 0</h3>
-          </div>
-        </div>
-
-        <div class="bg-white p-5 rounded-xl shadow-sm border border-gray-100 flex items-center space-x-4">
-          <div class="p-3 bg-blue-100 text-blue-700 rounded-lg">
-            <i class="fa-solid fa-coins text-2xl"></i>
-          </div>
-          <div>
-            <p class="text-xs text-gray-500 uppercase tracking-wider font-semibold">Estimasi Net Profit</p>
-            <h3 id="statNetProfit" class="text-xl font-bold text-gray-800">Rp 0</h3>
-          </div>
-        </div>
-      </div>
-
-      <!-- Main Features Grid -->
-      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        
-        <!-- 1. KALKULATOR & CATATAN PANEN -->
-        <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 space-y-4">
-          <div class="flex items-center space-x-2 border-b pb-3">
-            <i class="fa-solid fa-calculator text-sawit-green text-xl"></i>
-            <h2 class="text-lg font-bold text-gray-800">Kalkulator & Catatan Panen</h2>
-          </div>
-
-          <form onsubmit="saveHarvestRecord(event)" class="space-y-3">
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              <div>
-                <label class="block text-xs font-medium text-gray-600 mb-1">Tanggal Panen</label>
-                <input type="date" id="harvestDate" required class="w-full px-3 py-1.5 text-sm border rounded-lg focus:ring-2 focus:ring-green-500 focus:outline-none" />
-              </div>
-              <div>
-                <label class="block text-xs font-medium text-gray-600 mb-1">Luas Lahan (Ha)</label>
-                <input type="number" step="0.1" id="harvestArea" placeholder="Contoh: 2.5" required class="w-full px-3 py-1.5 text-sm border rounded-lg focus:ring-2 focus:ring-green-500 focus:outline-none" />
-              </div>
+                <!-- MOBILE MENU BUTTON -->
+                <div class="md:hidden flex items-center">
+                    <button id="mobile-menu-btn" onclick="toggleMobileMenu()" class="text-gray-200 hover:text-white focus:outline-none p-2">
+                        <i class="fa-solid fa-bars text-xl"></i>
+                    </button>
+                </div>
             </div>
+        </div>
 
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              <div>
-                <label class="block text-xs font-medium text-gray-600 mb-1">Berat Total (Kg)</label>
-                <input type="number" id="harvestWeight" oninput="calculateHarvest()" placeholder="0" required class="w-full px-3 py-1.5 text-sm border rounded-lg focus:ring-2 focus:ring-green-500 focus:outline-none" />
-              </div>
-              <div>
-                <label class="block text-xs font-medium text-gray-600 mb-1">Harga per Kg (Rp)</label>
-                <input type="number" id="harvestPrice" oninput="calculateHarvest()" placeholder="0" required class="w-full px-3 py-1.5 text-sm border rounded-lg focus:ring-2 focus:ring-green-500 focus:outline-none" />
-              </div>
-            </div>
-
-            <!-- Kalkulasi Otomatis Hasil -->
-            <div class="bg-green-50 p-3 rounded-lg flex justify-between items-center border border-green-200">
-              <span class="text-xs font-semibold text-green-800">Estimasi Total Pendapatan:</span>
-              <span id="calcTotalIncome" class="text-base font-bold text-green-700">Rp 0</span>
-            </div>
-
-            <button type="submit" class="w-full bg-sawit-green hover:bg-green-800 text-white font-semibold py-2 rounded-lg text-sm transition duration-200">
-              <i class="fa-solid fa-plus mr-1"></i> Simpan Data Panen
+        <!-- MOBILE MENU DROPDOWN -->
+        <div id="mobile-menu" class="hidden md:hidden bg-sawit-900 border-t border-sawit-700 px-4 pt-2 pb-4 space-y-2">
+            <button onclick="switchTab('dashboard'); toggleMobileMenu()" class="block w-full text-left px-3 py-2 text-sm text-gray-200 hover:bg-sawit-800 rounded">
+                <i class="fa-solid fa-chart-pie w-6"></i> Dashboard
             </button>
-          </form>
-        </div>
-
-        <!-- 2. CATATAN PERAWATAN SAWIT -->
-        <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 space-y-4">
-          <div class="flex items-center space-x-2 border-b pb-3">
-            <i class="fa-solid fa-hand-holding-droplet text-sawit-green text-xl"></i>
-            <h2 class="text-lg font-bold text-gray-800">Catatan Perawatan Kebun</h2>
-          </div>
-
-          <form onsubmit="saveMaintenanceRecord(event)" class="space-y-3">
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              <div>
-                <label class="block text-xs font-medium text-gray-600 mb-1">Tanggal Kegiatan</label>
-                <input type="date" id="maintDate" required class="w-full px-3 py-1.5 text-sm border rounded-lg focus:ring-2 focus:ring-green-500 focus:outline-none" />
-              </div>
-              <div>
-                <label class="block text-xs font-medium text-gray-600 mb-1">Kategori Perawatan</label>
-                <select id="maintCategory" required class="w-full px-3 py-1.5 text-sm border rounded-lg focus:ring-2 focus:ring-green-500 focus:outline-none">
-                  <option value="Pemupukan">Pemupukan</option>
-                  <option value="Penyemprotan">Penyemprotan (Herbisida/Pestisida)</option>
-                  <option value="Sanitasi">Sanitasi Kebun</option>
-                  <option value="Kastrasi">Kastrasi (Bunga/Buah Pasir)</option>
-                </select>
-              </div>
-            </div>
-
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              <div>
-                <label class="block text-xs font-medium text-gray-600 mb-1">Luas Lahan (Ha)</label>
-                <input type="number" step="0.1" id="maintArea" placeholder="Contoh: 2.5" required class="w-full px-3 py-1.5 text-sm border rounded-lg focus:ring-2 focus:ring-green-500 focus:outline-none" />
-              </div>
-              <div>
-                <label class="block text-xs font-medium text-gray-600 mb-1">Biaya Perawatan (Rp)</label>
-                <input type="number" id="maintCost" placeholder="0" required class="w-full px-3 py-1.5 text-sm border rounded-lg focus:ring-2 focus:ring-green-500 focus:outline-none" />
-              </div>
-            </div>
-
-            <div>
-              <label class="block text-xs font-medium text-gray-600 mb-1">Detail / Catatan Bahan & Pekerja</label>
-              <textarea id="maintDetail" rows="2" placeholder="Detail jenis pupuk/dosis/jumlah pekerja..." class="w-full px-3 py-1.5 text-sm border rounded-lg focus:ring-2 focus:ring-green-500 focus:outline-none"></textarea>
-            </div>
-
-            <button type="submit" class="w-full bg-sawit-green hover:bg-green-800 text-white font-semibold py-2 rounded-lg text-sm transition duration-200">
-              <i class="fa-solid fa-plus mr-1"></i> Simpan Catatan Perawatan
+            <button onclick="switchTab('panen'); toggleMobileMenu()" class="block w-full text-left px-3 py-2 text-sm text-gray-200 hover:bg-sawit-800 rounded">
+                <i class="fa-solid fa-wheat-awn w-6"></i> Catatan Panen
             </button>
-          </form>
-        </div>
-
-      </div>
-
-      <!-- RIWAYAT & PENYIMPANAN DATA TABEL -->
-      <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 space-y-4">
-        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 border-b pb-4">
-          <div class="flex items-center space-x-2">
-            <i class="fa-solid fa-database text-sawit-green text-xl"></i>
-            <h2 class="text-lg font-bold text-gray-800">Riwayat Catatan Kebun</h2>
-          </div>
-
-          <!-- Controls Filter & Export -->
-          <div class="flex flex-wrap gap-2 w-full sm:w-auto">
-            <select id="filterType" onchange="renderTables()" class="text-xs border px-3 py-1.5 rounded-lg focus:outline-none">
-              <option value="all">Semua Data</option>
-              <option value="harvest">Panen Saja</option>
-              <option value="maintenance">Perawatan Saja</option>
-            </select>
-            <button onclick="exportCSV()" class="text-xs bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-1.5 rounded-lg transition duration-200">
-              <i class="fa-solid fa-file-excel mr-1"></i> Ekspor CSV
+            <button onclick="switchTab('perawatan'); toggleMobileMenu()" class="block w-full text-left px-3 py-2 text-sm text-gray-200 hover:bg-sawit-800 rounded">
+                <i class="fa-solid fa-hand-holding-droplet w-6"></i> Perawatan Sawit
             </button>
-          </div>
+            <button onclick="switchTab('auth'); toggleMobileMenu()" class="block w-full text-left px-3 py-2 text-sm text-yellow-400 hover:bg-sawit-800 rounded">
+                <i class="fa-solid fa-user-gear w-6"></i> Reg / Profile Kelompok Tani
+            </button>
         </div>
+    </header>
 
-        <!-- Tabel Catatan Panen -->
-        <div id="harvestTableWrapper" class="space-y-2">
-          <h3 class="text-sm font-semibold text-gray-700 flex items-center">
-            <i class="fa-solid fa-wheat-awn text-amber-600 mr-2"></i> Riwayat Panen
-          </h3>
-          <div class="overflow-x-auto">
-            <table class="w-full text-left text-xs border-collapse">
-              <thead>
-                <tr class="bg-gray-50 border-b text-gray-600 uppercase">
-                  <th class="p-2.5">Tanggal</th>
-                  <th class="p-2.5">Luas Lahan</th>
-                  <th class="p-2.5">Berat (Kg)</th>
-                  <th class="p-2.5">Harga / Kg</th>
-                  <th class="p-2.5">Total Pendapatan</th>
-                  <th class="p-2.5 text-center">Aksi</th>
-                </tr>
-              </thead>
-              <tbody id="harvestTableBody" class="divide-y divide-gray-100">
-                <!-- Dynamic Rows -->
-              </tbody>
-            </table>
-          </div>
-        </div>
+    <!-- NOTIFICATION ALERT POPUP -->
+    <div id="toast-container" class="fixed bottom-5 right-5 z-50 flex flex-col space-y-2"></div>
 
-        <!-- Tabel Catatan Perawatan -->
-        <div id="maintTableWrapper" class="space-y-2 pt-4">
-          <h3 class="text-sm font-semibold text-gray-700 flex items-center">
-            <i class="fa-solid fa-kit-medical text-blue-600 mr-2"></i> Riwayat Perawatan Kebun
-          </h3>
-          <div class="overflow-x-auto">
-            <table class="w-full text-left text-xs border-collapse">
-              <thead>
-                <tr class="bg-gray-50 border-b text-gray-600 uppercase">
-                  <th class="p-2.5">Tanggal</th>
-                  <th class="p-2.5">Kategori</th>
-                  <th class="p-2.5">Luas Lahan</th>
-                  <th class="p-2.5">Biaya (Rp)</th>
-                  <th class="p-2.5">Detail Catatan</th>
-                  <th class="p-2.5 text-center">Aksi</th>
-                </tr>
-              </thead>
-              <tbody id="maintTableBody" class="divide-y divide-gray-100">
-                <!-- Dynamic Rows -->
-              </tbody>
-            </table>
-          </div>
-        </div>
+    <!-- MAIN CONTENT CONTAINER -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 flex-grow w-full">
 
-      </div>
+        <!-- ================= TAB 1: DASHBOARD OVERVIEW ================= -->
+        <section id="tab-dashboard" class="space-y-6">
+            <!-- WELCOME BANNER -->
+            <div class="bg-gradient-to-r from-sawit-800 to-sawit-900 rounded-2xl p-6 text-white shadow-md relative overflow-hidden">
+                <div class="relative z-10">
+                    <h1 class="text-2xl sm:text-3xl font-bold">Selamat Datang di SawitKu.Id</h1>
+                    <p class="text-sm sm:text-base text-sawit-100 mt-1 max-w-2xl">
+                        Aplikasi pencatatan panen, kalkulator tonase otomatis, dan manajemen perawatan kebun kelapa sawit terpadu.
+                    </p>
+                    <div class="mt-4 flex flex-wrap gap-2 text-xs">
+                        <span class="bg-sawit-700/60 px-3 py-1 rounded-full border border-sawit-500/30" id="dash-group-tag"><i class="fa-solid fa-users mr-1"></i> Kelompok Tani: Belum Terdaftar</span>
+                        <span class="bg-sawit-700/60 px-3 py-1 rounded-full border border-sawit-500/30" id="dash-area-tag"><i class="fa-solid fa-vector-square mr-1"></i> Luas Lahan: 0 Ha</span>
+                    </div>
+                </div>
+                <i class="fa-solid fa-tree opacity-10 text-9xl absolute -right-4 -bottom-8 pointer-events-none"></i>
+            </div>
 
-    </div>
-  </main>
+            <!-- STATISTIC CARDS -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                <!-- Card 1 -->
+                <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm flex items-center justify-between">
+                    <div>
+                        <p class="text-xs font-medium text-slate-500 uppercase tracking-wider">Total Hasil Panen</p>
+                        <h3 class="text-2xl font-bold text-slate-800 mt-1" id="stat-total-ton">0.00 <span class="text-sm font-normal text-slate-500">Ton</span></h3>
+                        <p class="text-xs text-sawit-600 mt-1"><i class="fa-solid fa-arrow-trend-up mr-1"></i>TBS Terkumpul</p>
+                    </div>
+                    <div class="w-12 h-12 bg-emerald-100 text-emerald-600 rounded-xl flex items-center justify-center text-xl">
+                        <i class="fa-solid fa-weight-hanging"></i>
+                    </div>
+                </div>
 
-  <!-- FOOTER -->
-  <footer class="bg-sawit-dark text-white text-xs py-4 text-center mt-auto border-t border-green-900">
-    <div class="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row justify-between items-center gap-2">
-      <p>&copy; 2026 <b>SawitKu.id</b> - Aplikasi Catatan & Perawatan Perkebunan Sawit.</p>
-      <p class="text-gray-400">Responsif di Android, Tablet, & Desktop</p>
-    </div>
-  </footer>
+                <!-- Card 2 -->
+                <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm flex items-center justify-between">
+                    <div>
+                        <p class="text-xs font-medium text-slate-500 uppercase tracking-wider">Estimasi Pendapatan</p>
+                        <h3 class="text-2xl font-bold text-slate-800 mt-1" id="stat-total-income">Rp 0</h3>
+                        <p class="text-xs text-sawit-600 mt-1"><i class="fa-solid fa-coins mr-1"></i>Akumulasi Penjualan</p>
+                    </div>
+                    <div class="w-12 h-12 bg-yellow-100 text-yellow-600 rounded-xl flex items-center justify-center text-xl">
+                        <i class="fa-solid fa-money-bill-wave"></i>
+                    </div>
+                </div>
 
-  <!-- LOGIC & JAVASCRIPT -->
-  <script>
-    // State global pengguna
-    let currentUser = JSON.parse(localStorage.getItem('sawitku_user')) || null;
+                <!-- Card 3 -->
+                <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm flex items-center justify-between">
+                    <div>
+                        <p class="text-xs font-medium text-slate-500 uppercase tracking-wider">Rata-Rata Produktivitas</p>
+                        <h3 class="text-2xl font-bold text-slate-800 mt-1" id="stat-productivity">0.0 <span class="text-sm font-normal text-slate-500">Ton/Ha</span></h3>
+                        <p class="text-xs text-slate-500 mt-1"><i class="fa-solid fa-chart-line mr-1"></i>Efisiensi Lahan</p>
+                    </div>
+                    <div class="w-12 h-12 bg-blue-100 text-blue-600 rounded-xl flex items-center justify-center text-xl">
+                        <i class="fa-solid fa-seedling"></i>
+                    </div>
+                </div>
 
-    // Inisialisasi Aplikasi
-    document.addEventListener('DOMContentLoaded', () => {
-      // Set Tanggal Input Hari Ini secara Default
-      const today = new Date().toISOString().split('T')[0];
-      document.getElementById('harvestDate').value = today;
-      document.getElementById('maintDate').value = today;
+                <!-- Card 4 -->
+                <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm flex items-center justify-between">
+                    <div>
+                        <p class="text-xs font-medium text-slate-500 uppercase tracking-wider">Kegiatan Perawatan</p>
+                        <h3 class="text-2xl font-bold text-slate-800 mt-1" id="stat-total-maintenance">0 <span class="text-sm font-normal text-slate-500">Pencatatan</span></h3>
+                        <p class="text-xs text-slate-500 mt-1"><i class="fa-solid fa-list-check mr-1"></i>Pupuk, Semprot, Sanitasi</p>
+                    </div>
+                    <div class="w-12 h-12 bg-purple-100 text-purple-600 rounded-xl flex items-center justify-center text-xl">
+                        <i class="fa-solid fa-clipboard-list"></i>
+                    </div>
+                </div>
+            </div>
 
-      checkAuth();
-    });
+            <!-- QUICK ACTIONS & RECENT ACTIVITY -->
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <!-- Panen Terakhir -->
+                <div class="lg:col-span-2 bg-white rounded-xl border border-slate-200 p-5 shadow-sm">
+                    <div class="flex justify-between items-center mb-4">
+                        <h2 class="text-base font-bold text-slate-800 flex items-center">
+                            <i class="fa-solid fa-clock-rotate-left text-sawit-600 mr-2"></i> Panen Terakhir
+                        </h2>
+                        <button onclick="switchTab('panen')" class="text-xs text-sawit-600 font-semibold hover:underline">Lihat Semua &rarr;</button>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left text-xs text-slate-600">
+                            <thead class="bg-slate-100 text-slate-700 uppercase">
+                                <tr>
+                                    <th class="p-2.5 rounded-l">Tanggal</th>
+                                    <th class="p-2.5">Luas Lahan</th>
+                                    <th class="p-2.5">Tandan (TBS)</th>
+                                    <th class="p-2.5">Total Tonase</th>
+                                    <th class="p-2.5 rounded-r">Total Pendapatan</th>
+                                </tr>
+                            </thead>
+                            <tbody id="dashboard-recent-harvest">
+                                <tr>
+                                    <td colspan="5" class="text-center py-6 text-slate-400">Belum ada catatan panen. Silakan tambah di menu Catatan Panen.</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
 
-    // Switch Tab Autentikasi
-    function switchAuthTab(type) {
-      const regForm = document.getElementById('registerForm');
-      const loginForm = document.getElementById('loginForm');
-      const regBtn = document.getElementById('tabRegisterBtn');
-      const loginBtn = document.getElementById('tabLoginBtn');
+                <!-- Export & Backup Data -->
+                <div class="bg-white rounded-xl border border-slate-200 p-5 shadow-sm flex flex-col justify-between">
+                    <div>
+                        <h2 class="text-base font-bold text-slate-800 mb-2 flex items-center">
+                            <i class="fa-solid fa-file-export text-sawit-600 mr-2"></i> Ekspor Data Sawit
+                        </h2>
+                        <p class="text-xs text-slate-500 mb-4">Unduh seluruh rekaman catatan panen dan perawatan sawit Anda ke format CSV atau backup JSON.</p>
+                    </div>
+                    <div class="space-y-2">
+                        <button onclick="exportToCSV()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white text-xs py-2.5 px-4 rounded-lg font-medium transition flex items-center justify-center">
+                            <i class="fa-solid fa-file-csv text-base mr-2"></i> Download Laporan (CSV)
+                        </button>
+                        <button onclick="exportToJSON()" class="w-full bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs py-2.5 px-4 rounded-lg font-medium transition flex items-center justify-center border border-slate-300">
+                            <i class="fa-solid fa-code text-base mr-2"></i> Backup Data (JSON)
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
 
-      if (type === 'register') {
-        regForm.classList.remove('hidden');
-        loginForm.classList.add('hidden');
-        regBtn.className = "w-1/2 py-2 text-center font-semibold text-sawit-green border-b-2 border-sawit-green focus:outline-none";
-        loginBtn.className = "w-1/2 py-2 text-center font-semibold text-gray-400 border-b-2 border-transparent hover:text-sawit-green focus:outline-none";
-      } else {
-        loginForm.classList.remove('hidden');
-        regForm.classList.add('hidden');
-        loginBtn.className = "w-1/2 py-2 text-center font-semibold text-sawit-green border-b-2 border-sawit-green focus:outline-none";
-        regBtn.className = "w-1/2 py-2 text-center font-semibold text-gray-400 border-b-2 border-transparent hover:text-sawit-green focus:outline-none";
-      }
-    }
+        <!-- ================= TAB 2: CATATAN PANEN & KALKULATOR ================= -->
+        <section id="tab-panen" class="hidden space-y-6">
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                
+                <!-- FORM PANEN & KALKULATOR OTOMATIS -->
+                <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
+                    <div class="border-b border-slate-200 pb-3 mb-4">
+                        <h2 class="text-lg font-bold text-slate-800 flex items-center">
+                            <i class="fa-solid fa-calculator text-sawit-600 mr-2"></i> Form Input & Kalkulator
+                        </h2>
+                        <p class="text-xs text-slate-500">Hitung tonase & pendapatan secara otomatis</p>
+                    </div>
 
-    // Handle Registrasi
-    function handleRegister(e) {
-      e.preventDefault();
-      const name = document.getElementById('regName').value.trim();
-      const poktan = document.getElementById('regPoktan').value.trim();
-      const phone = document.getElementById('regPhone').value.trim();
-      const pass = document.getElementById('regPass').value;
+                    <form id="harvest-form" onsubmit="handleSaveHarvest(event)" class="space-y-4">
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-700 mb-1">Tanggal Buat / Panen</label>
+                            <input type="date" id="harvest-date" required class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-sawit-500 focus:outline-none">
+                        </div>
 
-      let users = JSON.parse(localStorage.getItem('sawitku_users_db')) || [];
-      if (users.some(u => u.phone === phone)) {
-        alert('Nomor HP sudah terdaftar. Silakan login.');
-        return;
-      }
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-700 mb-1">Luas Lahan (Hektar / Ha)</label>
+                            <input type="number" step="0.01" id="harvest-area" placeholder="Contoh: 2.5" required oninput="calculateHarvest()" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-sawit-500 focus:outline-none">
+                        </div>
 
-      const newUser = { name, poktan, phone, pass };
-      users.push(newUser);
-      localStorage.setItem('sawitku_users_db', JSON.stringify(users));
-      
-      // Auto Login
-      currentUser = newUser;
-      localStorage.setItem('sawitku_user', JSON.stringify(currentUser));
-      alert(`Registrasi berhasil! Selamat datang, ${name} (${poktan}).`);
-      checkAuth();
-    }
+                        <div class="grid grid-cols-2 gap-3">
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-700 mb-1">Jumlah Tandan (TBS)</label>
+                                <input type="number" id="harvest-bunches" placeholder="0" required oninput="calculateHarvest()" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-sawit-500 focus:outline-none">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-700 mb-1">Rata-rata Berat (Kg)</label>
+                                <input type="number" step="0.1" id="harvest-avg-weight" placeholder="Contoh: 14" required oninput="calculateHarvest()" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-sawit-500 focus:outline-none">
+                            </div>
+                        </div>
 
-    // Handle Login
-    function handleLogin(e) {
-      e.preventDefault();
-      const phone = document.getElementById('loginPhone').value.trim();
-      const pass = document.getElementById('loginPass').value;
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-700 mb-1">Harga TBS per Kg (Rp)</label>
+                            <input type="number" id="harvest-price" placeholder="Contoh: 2400" required oninput="calculateHarvest()" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-sawit-500 focus:outline-none">
+                        </div>
 
-      let users = JSON.parse(localStorage.getItem('sawitku_users_db')) || [];
-      const user = users.find(u => u.phone === phone && u.pass === pass);
+                        <!-- AUTO CALCULATOR RESULTS BOX -->
+                        <div class="bg-sawit-50 border border-sawit-200 rounded-xl p-4 space-y-2">
+                            <p class="text-xs font-bold text-sawit-800 uppercase tracking-wider flex items-center">
+                                <i class="fa-solid fa-wand-magic-sparkles mr-1.5 text-sawit-600"></i> Hasil Hitung Otomatis
+                            </p>
+                            <div class="flex justify-between items-center text-xs">
+                                <span class="text-slate-600">Total Berat (Kg):</span>
+                                <span class="font-bold text-slate-800" id="calc-total-kg">0 Kg</span>
+                            </div>
+                            <div class="flex justify-between items-center text-xs">
+                                <span class="text-slate-600">Total Tonase:</span>
+                                <span class="font-bold text-sawit-700 text-sm" id="calc-total-ton">0.00 Ton</span>
+                            </div>
+                            <div class="flex justify-between items-center text-xs">
+                                <span class="text-slate-600">Produktivitas:</span>
+                                <span class="font-bold text-slate-800" id="calc-productivity">0 Ton/Ha</span>
+                            </div>
+                            <div class="border-t border-sawit-200 pt-2 flex justify-between items-center text-xs">
+                                <span class="font-semibold text-slate-700">Estimasi Pendapatan:</span>
+                                <span class="font-bold text-emerald-700 text-base" id="calc-total-revenue">Rp 0</span>
+                            </div>
+                        </div>
 
-      if (user) {
-        currentUser = user;
-        localStorage.setItem('sawitku_user', JSON.stringify(currentUser));
-        checkAuth();
-      } else {
-        alert('Nomor HP atau kata sandi salah!');
-      }
-    }
+                        <button type="submit" class="w-full bg-sawit-600 hover:bg-sawit-700 text-white font-semibold py-2.5 rounded-lg shadow text-sm transition">
+                            <i class="fa-solid fa-floppy-disk mr-1"></i> Simpan Catatan Panen
+                        </button>
+                    </form>
+                </div>
 
-    // Logout
-    function logout() {
-      currentUser = null;
-      localStorage.removeItem('sawitku_user');
-      checkAuth();
-    }
+                <!-- RIWAYAT PANEN TABLE -->
+                <div class="lg:col-span-2 bg-white p-6 rounded-xl border border-slate-200 shadow-sm flex flex-col justify-between">
+                    <div>
+                        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 border-b border-slate-200 pb-3 mb-4">
+                            <div>
+                                <h2 class="text-lg font-bold text-slate-800">Riwayat Hasil Panen</h2>
+                                <p class="text-xs text-slate-500">Tabel data hasil panen yang tersimpan</p>
+                            </div>
+                            <!-- FILTER TANGGAL / CARI -->
+                            <div class="flex items-center space-x-2 w-full sm:w-auto">
+                                <input type="text" id="search-harvest" oninput="renderHarvestTable()" placeholder="Cari tanggal..." class="px-3 py-1.5 border border-slate-300 rounded-lg text-xs w-full sm:w-48 focus:outline-none focus:ring-1 focus:ring-sawit-500">
+                            </div>
+                        </div>
 
-    // Cek Status Autentikasi untuk UI
-    function checkAuth() {
-      const authSection = document.getElementById('authSection');
-      const dashboardSection = document.getElementById('dashboardSection');
-      const navUser = document.getElementById('navUser');
-      const userDisplayName = document.getElementById('userDisplayName');
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left text-xs">
+                                <thead class="bg-slate-100 text-slate-700 uppercase font-semibold">
+                                    <tr>
+                                        <th class="p-3">Tanggal</th>
+                                        <th class="p-3">Luas Lahan</th>
+                                        <th class="p-3">TBS / Berat</th>
+                                        <th class="p-3">Total Ton</th>
+                                        <th class="p-3">Pendapatan</th>
+                                        <th class="p-3 text-center">Aksi</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="harvest-table-body" class="divide-y divide-slate-100">
+                                    <!-- Dynamic rows loaded via JS -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
 
-      if (currentUser) {
-        authSection.classList.add('hidden');
-        dashboardSection.classList.remove('hidden');
-        navUser.classList.remove('hidden');
-        navUser.classList.add('flex');
-        userDisplayName.textContent = `${currentUser.name} (${currentUser.poktan})`;
-        renderTables();
-      } else {
-        authSection.classList.remove('hidden');
-        dashboardSection.classList.add('hidden');
-        navUser.classList.add('hidden');
-        navUser.classList.remove('flex');
-      }
-    }
+            </div>
+        </section>
 
-    // Hitung Otomatis Estimasi Panen
-    function calculateHarvest() {
-      const weight = parseFloat(document.getElementById('harvestWeight').value) || 0;
-      const price = parseFloat(document.getElementById('harvestPrice').value) || 0;
-      const total = weight * price;
-      document.getElementById('calcTotalIncome').textContent = formatRupiah(total);
-    }
-
-    // Format Angka ke Rupiah
-    function formatRupiah(number) {
-      return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(number);
-    }
-
-    // KUNCI KEY DATA PER USER
-    function getHarvestStorageKey() {
-      return `sawitku_harvest_${currentUser.phone}`;
-    }
-
-    function getMaintStorageKey() {
-      return `sawitku_maint_${currentUser.phone}`;
-    }
-
-    // Simpan Catatan Panen
-    function saveHarvestRecord(e) {
-      e.preventDefault();
-      const date = document.getElementById('harvestDate').value;
-      const area = document.getElementById('harvestArea').value;
-      const weight = parseFloat(document.getElementById('harvestWeight').value);
-      const price = parseFloat(document.getElementById('harvestPrice').value);
-      const total = weight * price;
-
-      const record = { id: Date.now(), date, area, weight, price, total };
-
-      let list = JSON.parse(localStorage.getItem(getHarvestStorageKey())) || [];
-      list.push(record);
-      localStorage.setItem(getHarvestStorageKey(), JSON.stringify(list));
-
-      // Reset Form & Refresh
-      e.target.reset();
-      document.getElementById('harvestDate').value = new Date().toISOString().split('T')[0];
-      document.getElementById('calcTotalIncome').textContent = 'Rp 0';
-      renderTables();
-    }
-
-    // Simpan Catatan Perawatan
-    function saveMaintenanceRecord(e) {
-      e.preventDefault();
-      const date = document.getElementById('maintDate').value;
-      const category = document.getElementById('maintCategory').value;
-      const area = document.getElementById('maintArea').value;
-      const cost = parseFloat(document.getElementById('maintCost').value);
-      const detail = document.getElementById('maintDetail').value;
-
-      const record = { id: Date.now(), date, category, area, cost, detail };
-
-      let list = JSON.parse(localStorage.getItem(getMaintStorageKey())) || [];
-      list.push(record);
-      localStorage.setItem(getMaintStorageKey(), JSON.stringify(list));
-
-      e.target.reset();
-      document.getElementById('maintDate').value = new Date().toISOString().split('T')[0];
-      renderTables();
-    }
-
-    // Render Tabel & Update Stats
-    function renderTables() {
-      if (!currentUser) return;
-
-      const harvests = JSON.parse(localStorage.getItem(getHarvestStorageKey())) || [];
-      const maints = JSON.parse(localStorage.getItem(getMaintStorageKey())) || [];
-      const filter = document.getElementById('filterType').value;
-
-      // 1. Render Harvest Table
-      const harvestWrapper = document.getElementById('harvestTableWrapper');
-      const harvestTbody = document.getElementById('harvestTableBody');
-      harvestTbody.innerHTML = '';
-
-      if (filter === 'maintenance') {
-        harvestWrapper.classList.add('hidden');
-      } else {
-        harvestWrapper.classList.remove('hidden');
-        if (harvests.length === 0) {
-          harvestTbody.innerHTML = `<tr><td colspan="6" class="text-center py-4 text-gray-400">Belum ada catatan panen.</td></tr>`;
-        } else {
-          harvests.sort((a,b) => new Date(b.date) - new Date(a.date)).forEach(h => {
-            const tr = document.createElement('tr');
-            tr.className = "hover:bg-gray-50";
-            tr.innerHTML = `
-              <td class="p-2.5">${h.date}</td>
-              <td class="p-2.5">${h.area} Ha</td>
-              <td class="p-2.5 font-semibold">${h.weight.toLocaleString('id-ID')} Kg</td>
-              <td class="p-2.5">${formatRupiah(h.price)}</td>
-              <td class="p-2.5 text-green-700 font-semibold">${formatRupiah(h.total)}</td>
-              <td class="p-2.5 text-center">
-                <button onclick="deleteRecord('harvest', ${h.id})" class="text-red-500 hover:text-red-700">
-                  <i class="fa-solid fa-trash"></i>
+        <!-- ================= TAB 3: CATATAN PERAWATAN SAWIT ================= -->
+        <section id="tab-perawatan" class="hidden space-y-6">
+            
+            <!-- CATEGORY NAVIGATION TABS -->
+            <div class="bg-white rounded-xl border border-slate-200 p-2 shadow-sm flex flex-wrap gap-2">
+                <button onclick="switchMaintenanceTab('pemupukan')" id="btn-maint-pemupukan" class="flex-1 min-w-[130px] py-2 px-3 text-xs font-semibold rounded-lg bg-sawit-600 text-white transition flex items-center justify-center">
+                    <i class="fa-solid fa-flask mr-1.5"></i> Pemupukan
                 </button>
-              </td>
-            `;
-            harvestTbody.appendChild(tr);
-          });
-        }
-      }
-
-      // 2. Render Maintenance Table
-      const maintWrapper = document.getElementById('maintTableWrapper');
-      const maintTbody = document.getElementById('maintTableBody');
-      maintTbody.innerHTML = '';
-
-      if (filter === 'harvest') {
-        maintWrapper.classList.add('hidden');
-      } else {
-        maintWrapper.classList.remove('hidden');
-        if (maints.length === 0) {
-          maintTbody.innerHTML = `<tr><td colspan="6" class="text-center py-4 text-gray-400">Belum ada catatan perawatan.</td></tr>`;
-        } else {
-          maints.sort((a,b) => new Date(b.date) - new Date(a.date)).forEach(m => {
-            const tr = document.createElement('tr');
-            tr.className = "hover:bg-gray-50";
-            tr.innerHTML = `
-              <td class="p-2.5">${m.date}</td>
-              <td class="p-2.5"><span class="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-blue-100 text-blue-800">${m.category}</span></td>
-              <td class="p-2.5">${m.area} Ha</td>
-              <td class="p-2.5 text-amber-700 font-semibold">${formatRupiah(m.cost)}</td>
-              <td class="p-2.5 text-gray-600 max-w-xs truncate">${m.detail || '-'}</td>
-              <td class="p-2.5 text-center">
-                <button onclick="deleteRecord('maint', ${m.id})" class="text-red-500 hover:text-red-700">
-                  <i class="fa-solid fa-trash"></i>
+                <button onclick="switchMaintenanceTab('penyemprotan')" id="btn-maint-penyemprotan" class="flex-1 min-w-[130px] py-2 px-3 text-xs font-semibold rounded-lg bg-slate-100 text-slate-600 hover:bg-slate-200 transition flex items-center justify-center">
+                    <i class="fa-solid fa-spray-can mr-1.5"></i> Penyemprotan
                 </button>
-              </td>
-            `;
-            maintTbody.appendChild(tr);
-          });
+                <button onclick="switchMaintenanceTab('sanitasi')" id="btn-maint-sanitasi" class="flex-1 min-w-[130px] py-2 px-3 text-xs font-semibold rounded-lg bg-slate-100 text-slate-600 hover:bg-slate-200 transition flex items-center justify-center">
+                    <i class="fa-solid fa-broom mr-1.5"></i> Sanitasi Kebun
+                </button>
+                <button onclick="switchMaintenanceTab('kastrasi')" id="btn-maint-kastrasi" class="flex-1 min-w-[130px] py-2 px-3 text-xs font-semibold rounded-lg bg-slate-100 text-slate-600 hover:bg-slate-200 transition flex items-center justify-center">
+                    <i class="fa-solid fa-scissors mr-1.5"></i> Kastrasi
+                </button>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                
+                <!-- INPUT FORM PERAWATAN -->
+                <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
+                    <div class="border-b border-slate-200 pb-3 mb-4">
+                        <h2 class="text-base font-bold text-slate-800" id="maint-form-title">Catat Pemupukan</h2>
+                        <p class="text-xs text-slate-500">Masukkan detail kegiatan perawatan sawit</p>
+                    </div>
+
+                    <form id="maintenance-form" onsubmit="handleSaveMaintenance(event)" class="space-y-4">
+                        <input type="hidden" id="maint-category" value="pemupukan">
+
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-700 mb-1">Tanggal Buat / Kegiatan</label>
+                            <input type="date" id="maint-date" required class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-sawit-500 focus:outline-none">
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-700 mb-1">Luas Lahan (Ha)</label>
+                            <input type="number" step="0.01" id="maint-area" placeholder="Luas lahan yang dirawat" required class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-sawit-500 focus:outline-none">
+                        </div>
+
+                        <!-- DYNAMIC FIELDS BASED ON CATEGORY -->
+                        <div id="dynamic-maint-fields" class="space-y-4">
+                            <!-- Injected by JavaScript -->
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-700 mb-1">Catatan / Keterangan Tambahan</label>
+                            <textarea id="maint-notes" rows="2" placeholder="Catatan kondisi lapangan..." class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-sawit-500 focus:outline-none"></textarea>
+                        </div>
+
+                        <button type="submit" class="w-full bg-sawit-600 hover:bg-sawit-700 text-white font-semibold py-2.5 rounded-lg shadow text-sm transition">
+                            <i class="fa-solid fa-floppy-disk mr-1"></i> Simpan Record Perawatan
+                        </button>
+                    </form>
+                </div>
+
+                <!-- TABLE / CARDS RECORD PERAWATAN -->
+                <div class="lg:col-span-2 bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
+                    <div class="border-b border-slate-200 pb-3 mb-4 flex justify-between items-center">
+                        <div>
+                            <h2 class="text-base font-bold text-slate-800" id="maint-list-title">Riwayat Kegiatan Pemupukan</h2>
+                            <p class="text-xs text-slate-500">Daftar rekaman aktivitas harian perawatan</p>
+                        </div>
+                    </div>
+
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left text-xs">
+                            <thead class="bg-slate-100 text-slate-700 uppercase font-semibold">
+                                <tr>
+                                    <th class="p-3">Tanggal</th>
+                                    <th class="p-3">Luas Lahan</th>
+                                    <th class="p-3">Detail Aktivitas</th>
+                                    <th class="p-3">Catatan</th>
+                                    <th class="p-3 text-center">Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody id="maint-table-body" class="divide-y divide-slate-100">
+                                <!-- Dynamic rows loaded via JS -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- ================= TAB 4: AKUN & REGISTRASI KELOMPOK TANI ================= -->
+        <section id="tab-auth" class="hidden max-w-xl mx-auto">
+            <div class="bg-white p-8 rounded-2xl border border-slate-200 shadow-md">
+                <div class="text-center mb-6">
+                    <div class="w-14 h-14 bg-sawit-100 text-sawit-700 rounded-full flex items-center justify-center mx-auto mb-3 text-2xl">
+                        <i class="fa-solid fa-users-line"></i>
+                    </div>
+                    <h2 class="text-xl font-bold text-slate-800">Registrasi / Profil Kelompok Tani</h2>
+                    <p class="text-xs text-slate-500 mt-1">Daftarkan identitas petani dan kelompok tani Anda di SawitKu.Id</p>
+                </div>
+
+                <form id="auth-form" onsubmit="handleRegister(event)" class="space-y-4">
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-700 mb-1">Nama Lengkap Petani</label>
+                        <input type="text" id="reg-fullname" placeholder="Masukkan nama Anda" required class="w-full px-3.5 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-sawit-500 focus:outline-none">
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-700 mb-1">Nama Kelompok Tani</label>
+                        <input type="text" id="reg-group" placeholder="Contoh: Kelompok Tani Makmur Jaya" required class="w-full px-3.5 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-sawit-500 focus:outline-none">
+                    </div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-700 mb-1">Total Luas Lahan (Ha)</label>
+                            <input type="number" step="0.01" id="reg-area" placeholder="Luas dalam Hektar" required class="w-full px-3.5 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-sawit-500 focus:outline-none">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-700 mb-1">Email</label>
+                            <input type="email" id="reg-email" placeholder="nama@email.com" required class="w-full px-3.5 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-sawit-500 focus:outline-none">
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-700 mb-1">Kata Sandi (Password)</label>
+                        <input type="password" id="reg-password" placeholder="••••••••" required class="w-full px-3.5 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-sawit-500 focus:outline-none">
+                    </div>
+
+                    <button type="submit" class="w-full bg-sawit-700 hover:bg-sawit-800 text-white font-semibold py-3 rounded-lg shadow-md text-sm transition mt-2">
+                        <i class="fa-solid fa-address-card mr-1.5"></i> Simpan Data Registrasi
+                    </button>
+                </form>
+
+                <div id="auth-registered-info" class="hidden mt-6 pt-6 border-t border-slate-200 text-center">
+                    <p class="text-xs text-emerald-600 font-semibold mb-2"><i class="fa-solid fa-circle-check mr-1"></i> Akun Anda telah aktif dan terdaftar di perangkat ini.</p>
+                    <button onclick="resetAccount()" class="text-xs text-red-500 hover:underline"><i class="fa-solid fa-right-from-bracket mr-1"></i> Reset Data Akun</button>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="bg-sawit-dark text-slate-400 text-xs py-6 border-t border-sawit-800 mt-10">
+        <div class="max-w-7xl mx-auto px-4 text-center space-y-2">
+            <p>&copy; 2026 <span class="text-white font-semibold">SawitKu.Id</span> - Aplikasi Manajemen Panen & Perawatan Sawit digital.</p>
+            <p class="text-[11px] text-slate-500">Dirancang khusus untuk mendukung produktivitas Petani & Kelompok Tani Kelapa Sawit Indonesia.</p>
+        </div>
+    </footer>
+
+    <!-- JAVASCRIPT APP LOGIC -->
+    <script>
+        // DATA STORAGE STATE
+        let currentUser = JSON.parse(localStorage.getItem('sawitku_user')) || null;
+        let harvestRecords = JSON.parse(localStorage.getItem('sawitku_harvests')) || [];
+        let maintenanceRecords = JSON.parse(localStorage.getItem('sawitku_maintenances')) || [];
+        let activeMaintenanceTab = 'pemupukan';
+
+        // INIT APP ON LOAD
+        window.onload = function() {
+            // Set default date picker to today
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('harvest-date').value = today;
+            document.getElementById('maint-date').value = today;
+
+            checkUserSession();
+            renderHarvestTable();
+            switchMaintenanceTab('pemupukan');
+            updateDashboardStats();
+        };
+
+        // NAVIGATION LOGIC
+        function switchTab(tabName) {
+            const tabs = ['dashboard', 'panen', 'perawatan', 'auth'];
+            tabs.forEach(t => {
+                const el = document.getElementById(`tab-${t}`);
+                const nav = document.getElementById(`nav-${t}`);
+                if (t === tabName) {
+                    el.classList.remove('hidden');
+                    if (nav) nav.classList.add('text-yellow-400', 'font-bold');
+                } else {
+                    el.classList.add('hidden');
+                    if (nav) nav.classList.remove('text-yellow-400', 'font-bold');
+                }
+            });
+
+            if (tabName === 'dashboard') updateDashboardStats();
         }
-      }
 
-      // 3. Update Ringkasan Dashboard
-      const totalWeight = harvests.reduce((acc, item) => acc + item.weight, 0);
-      const totalIncome = harvests.reduce((acc, item) => acc + item.total, 0);
-      const totalMaintCost = maints.reduce((acc, item) => acc + item.cost, 0);
-      const netProfit = totalIncome - totalMaintCost;
+        function toggleMobileMenu() {
+            const menu = document.getElementById('mobile-menu');
+            menu.classList.toggle('hidden');
+        }
 
-      document.getElementById('statTotalWeight').textContent = `${totalWeight.toLocaleString('id-ID')} Kg`;
-      document.getElementById('statTotalIncome').textContent = formatRupiah(totalIncome);
-      document.getElementById('statTotalMaintenance').textContent = formatRupiah(totalMaintCost);
-      document.getElementById('statNetProfit').textContent = formatRupiah(netProfit);
-    }
+        // USER SESSION & REGISTRATION
+        function handleRegister(e) {
+            e.preventDefault();
+            const fullName = document.getElementById('reg-fullname').value;
+            const groupName = document.getElementById('reg-group').value;
+            const area = parseFloat(document.getElementById('reg-area').value);
+            const email = document.getElementById('reg-email').value;
 
-    // Hapus Record
-    function deleteRecord(type, id) {
-      if (!confirm('Apakah Anda yakin ingin menghapus data ini?')) return;
+            currentUser = { fullName, groupName, area, email };
+            localStorage.setItem('sawitku_user', JSON.stringify(currentUser));
 
-      if (type === 'harvest') {
-        let list = JSON.parse(localStorage.getItem(getHarvestStorageKey())) || [];
-        list = list.filter(item => item.id !== id);
-        localStorage.setItem(getHarvestStorageKey(), JSON.stringify(list));
-      } else {
-        let list = JSON.parse(localStorage.getItem(getMaintStorageKey())) || [];
-        list = list.filter(item => item.id !== id);
-        localStorage.setItem(getMaintStorageKey(), JSON.stringify(list));
-      }
+            showToast("Registrasi berhasil disimpan!", "success");
+            checkUserSession();
+            switchTab('dashboard');
+        }
 
-      renderTables();
-    }
+        function checkUserSession() {
+            if (currentUser) {
+                document.getElementById('user-display-name').innerText = currentUser.fullName;
+                document.getElementById('user-display-group').innerText = currentUser.groupName;
+                document.getElementById('user-profile-badge').classList.remove('hidden');
+                document.getElementById('btn-show-auth').innerHTML = '<i class="fa-solid fa-user-gear mr-1"></i> Profil';
 
-    // Ekspor Data ke CSV
-    function exportCSV() {
-      const harvests = JSON.parse(localStorage.getItem(getHarvestStorageKey())) || [];
-      const maints = JSON.parse(localStorage.getItem(getMaintStorageKey())) || [];
+                document.getElementById('dash-group-tag').innerHTML = `<i class="fa-solid fa-users mr-1"></i> Kelompok Tani: ${currentUser.groupName}`;
+                document.getElementById('dash-area-tag').innerHTML = `<i class="fa-solid fa-vector-square mr-1"></i> Luas Lahan: ${currentUser.area} Ha`;
 
-      if (harvests.length === 0 && maints.length === 0) {
-        alert('Belum ada data untuk diekspor.');
-        return;
-      }
+                // Fill form fields if editing
+                document.getElementById('reg-fullname').value = currentUser.fullName;
+                document.getElementById('reg-group').value = currentUser.groupName;
+                document.getElementById('reg-area').value = currentUser.area;
+                document.getElementById('reg-email').value = currentUser.email;
+                document.getElementById('harvest-area').value = currentUser.area;
+                document.getElementById('maint-area').value = currentUser.area;
 
-      let csvContent = "data:text/csv;charset=utf-8,";
-      csvContent += "=== DATA PANEN SAWIT ===\nTanggal,Luas Lahan (Ha),Berat (Kg),Harga (Rp),Total Pendapatan (Rp)\n";
-      harvests.forEach(h => {
-        csvContent += `${h.date},"${h.area}",${h.weight},${h.price},${h.total}\n`;
-      });
+                document.getElementById('auth-registered-info').classList.remove('hidden');
+            }
+        }
 
-      csvContent += "\n=== DATA PERAWATAN KEBUN ===\nTanggal,Kategori,Luas Lahan (Ha),Biaya (Rp),Detail Catatan\n";
-      maints.forEach(m => {
-        csvContent += `${m.date},${m.category},"${m.area}",${m.cost},"${(m.detail || '').replace(/"/g, '""')}"\n`;
-      });
+        function resetAccount() {
+            if (confirm("Apakah Anda yakin ingin mereset profil akun ini? Data panen tidak akan terhapus.")) {
+                localStorage.removeItem('sawitku_user');
+                currentUser = null;
+                location.reload();
+            }
+        }
 
-      const encodedUri = encodeURI(csvContent);
-      const link = document.createElement("a");
-      link.setAttribute("href", encodedUri);
-      link.setAttribute("download", `Laporan_SawitKu_${currentUser.name.replace(/\s+/g, '_')}.csv`);
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-    }
-  </script>
+        // AUTO CALCULATOR HARVEST
+        function calculateHarvest() {
+            const area = parseFloat(document.getElementById('harvest-area').value) || 0;
+            const bunches = parseFloat(document.getElementById('harvest-bunches').value) || 0;
+            const avgWeight = parseFloat(document.getElementById('harvest-avg-weight').value) || 0;
+            const price = parseFloat(document.getElementById('harvest-price').value) || 0;
+
+            const totalKg = bunches * avgWeight;
+            const totalTon = totalKg / 1000;
+            const productivity = area > 0 ? (totalTon / area) : 0;
+            const revenue = totalKg * price;
+
+            document.getElementById('calc-total-kg').innerText = `${totalKg.toLocaleString('id-ID')} Kg`;
+            document.getElementById('calc-total-ton').innerText = `${totalTon.toFixed(2)} Ton`;
+            document.getElementById('calc-productivity').innerText = `${productivity.toFixed(2)} Ton/Ha`;
+            document.getElementById('calc-total-revenue').innerText = `Rp ${revenue.toLocaleString('id-ID')}`;
+
+            return { totalKg, totalTon, productivity, revenue };
+        }
+
+        // HARVEST SAVE & RENDER
+        function handleSaveHarvest(e) {
+            e.preventDefault();
+            const calc = calculateHarvest();
+
+            const record = {
+                id: Date.now(),
+                date: document.getElementById('harvest-date').value,
+                area: parseFloat(document.getElementById('harvest-area').value),
+                bunches: parseInt(document.getElementById('harvest-bunches').value),
+                avgWeight: parseFloat(document.getElementById('harvest-avg-weight').value),
+                price: parseFloat(document.getElementById('harvest-price').value),
+                totalKg: calc.totalKg,
+                totalTon: calc.totalTon,
+                revenue: calc.revenue
+            };
+
+            harvestRecords.unshift(record);
+            localStorage.setItem('sawitku_harvests', JSON.stringify(harvestRecords));
+
+            showToast("Catatan panen berhasil disimpan!", "success");
+            document.getElementById('harvest-form').reset();
+            if (currentUser) document.getElementById('harvest-area').value = currentUser.area;
+            calculateHarvest();
+            renderHarvestTable();
+            updateDashboardStats();
+        }
+
+        function renderHarvestTable() {
+            const tbody = document.getElementById('harvest-table-body');
+            const search = document.getElementById('search-harvest').value.toLowerCase();
+            tbody.innerHTML = '';
+
+            const filtered = harvestRecords.filter(r => r.date.includes(search));
+
+            if (filtered.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="6" class="text-center py-6 text-slate-400">Belum ada catatan hasil panen.</td></tr>`;
+                return;
+            }
+
+            filtered.forEach(r => {
+                const tr = document.createElement('tr');
+                tr.className = "hover:bg-slate-50 transition";
+                tr.innerHTML = `
+                    <td class="p-3 font-medium text-slate-800">${r.date}</td>
+                    <td class="p-3">${r.area} Ha</td>
+                    <td class="p-3">${r.bunches} TBS (${r.avgWeight} kg/tbs)</td>
+                    <td class="p-3 font-semibold text-sawit-700">${r.totalTon.toFixed(2)} Ton</td>
+                    <td class="p-3 font-semibold text-emerald-600">Rp ${r.revenue.toLocaleString('id-ID')}</td>
+                    <td class="p-3 text-center">
+                        <button onclick="deleteHarvest(${r.id})" class="text-red-500 hover:text-red-700 p-1">
+                            <i class="fa-solid fa-trash"></i>
+                        </button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function deleteHarvest(id) {
+            if (confirm("Apakah Anda yakin ingin menghapus catatan panen ini?")) {
+                harvestRecords = harvestRecords.filter(r => r.id !== id);
+                localStorage.setItem('sawitku_harvests', JSON.stringify(harvestRecords));
+                renderHarvestTable();
+                updateDashboardStats();
+                showToast("Catatan berhasil dihapus", "info");
+            }
+        }
+
+        // MAINTENANCE TAB SWITCH & DYNAMIC FIELDS
+        function switchMaintenanceTab(cat) {
+            activeMaintenanceTab = cat;
+            document.getElementById('maint-category').value = cat;
+
+            const categories = ['pemupukan', 'penyemprotan', 'sanitasi', 'kastrasi'];
+            categories.forEach(c => {
+                const btn = document.getElementById(`btn-maint-${c}`);
+                if (c === cat) {
+                    btn.className = "flex-1 min-w-[130px] py-2 px-3 text-xs font-semibold rounded-lg bg-sawit-600 text-white shadow transition flex items-center justify-center";
+                } else {
+                    btn.className = "flex-1 min-w-[130px] py-2 px-3 text-xs font-semibold rounded-lg bg-slate-100 text-slate-600 hover:bg-slate-200 transition flex items-center justify-center";
+                }
+            });
+
+            const dynamicBox = document.getElementById('dynamic-maint-fields');
+            const titleForm = document.getElementById('maint-form-title');
+            const titleList = document.getElementById('maint-list-title');
+
+            if (cat === 'pemupukan') {
+                titleForm.innerText = "Catat Pemupukan";
+                titleList.innerText = "Riwayat Pemupukan";
+                dynamicBox.innerHTML = `
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-700 mb-1">Jenis Pupuk</label>
+                        <input type="text" id="maint-field-1" placeholder="Contoh: NPK 13-6-27, Urea, KCL" required class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-sawit-500">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-700 mb-1">Dosis (Kg / Pohon atau Kg / Ha)</label>
+                        <input type="text" id="maint-field-2" placeholder="Contoh: 2.5 Kg/Pohon" required class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-sawit-500">
+                    </div>
+                `;
+            } else if (cat === 'penyemprotan') {
+                titleForm.innerText = "Catat Penyemprotan (Herbisida)";
+                titleList.innerText = "Riwayat Penyemprotan";
+                dynamicBox.innerHTML = `
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-700 mb-1">Jenis Herbisida / Obat</label>
+                        <input type="text" id="maint-field-1" placeholder="Contoh: Glyphosate, Paraquat" required class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-sawit-500">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-700 mb-1">Dosis / Konsentrasi</label>
+                        <input type="text" id="maint-field-2" placeholder="Contoh: 200 ml / Tangki" required class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-sawit-500">
+                    </div>
+                `;
+            } else if (cat === 'sanitasi') {
+                titleForm.innerText = "Catat Sanitasi Kebun";
+                titleList.innerText = "Riwayat Sanitasi Kebun";
+                dynamicBox.innerHTML = `
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-700 mb-1">Aktivitas Sanitasi</label>
+                        <input type="text" id="maint-field-1" placeholder="Contoh: Babat piringan, Tunas frond, Pembersihan gulma" required class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-sawit-500">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-700 mb-1">Tenaga Kerja / Metode</label>
+                        <input type="text" id="maint-field-2" placeholder="Contoh: Manual 3 orang / Babat Mesin" required class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-sawit-500">
+                    </div>
+                `;
+            } else if (cat === 'kastrasi') {
+                titleForm.innerText = "Catat Kastrasi (Bunga Pasir)";
+                titleList.innerText = "Riwayat Kastrasi Sawit Muda";
+                dynamicBox.innerHTML = `
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-700 mb-1">Jumlah Pohon Dikastrasi</label>
+                        <input type="number" id="maint-field-1" placeholder="Contoh: 150 Pohon" required class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-sawit-500">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-700 mb-1">Umur Tanaman (Bulan/Tahun)</label>
+                        <input type="text" id="maint-field-2" placeholder="Contoh: 18 Bulan (TBM-2)" required class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-sawit-500">
+                    </div>
+                `;
+            }
+
+            renderMaintenanceTable();
+        }
+
+        // SAVE & RENDER MAINTENANCE
+        function handleSaveMaintenance(e) {
+            e.preventDefault();
+            const category = document.getElementById('maint-category').value;
+            const date = document.getElementById('maint-date').value;
+            const area = parseFloat(document.getElementById('maint-area').value);
+            const field1 = document.getElementById('maint-field-1').value;
+            const field2 = document.getElementById('maint-field-2').value;
+            const notes = document.getElementById('maint-notes').value;
+
+            const record = {
+                id: Date.now(),
+                category,
+                date,
+                area,
+                field1,
+                field2,
+                notes
+            };
+
+            maintenanceRecords.unshift(record);
+            localStorage.setItem('sawitku_maintenances', JSON.stringify(maintenanceRecords));
+
+            showToast("Record perawatan berhasil disimpan!", "success");
+            document.getElementById('maintenance-form').reset();
+            document.getElementById('maint-category').value = category;
+            if (currentUser) document.getElementById('maint-area').value = currentUser.area;
+            renderMaintenanceTable();
+            updateDashboardStats();
+        }
+
+        function renderMaintenanceTable() {
+            const tbody = document.getElementById('maint-table-body');
+            tbody.innerHTML = '';
+
+            const filtered = maintenanceRecords.filter(m => m.category === activeMaintenanceTab);
+
+            if (filtered.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="5" class="text-center py-6 text-slate-400">Belum ada rekaman kegiatan untuk kategori ini.</td></tr>`;
+                return;
+            }
+
+            filtered.forEach(m => {
+                const tr = document.createElement('tr');
+                tr.className = "hover:bg-slate-50 transition";
+                tr.innerHTML = `
+                    <td class="p-3 font-medium text-slate-800">${m.date}</td>
+                    <td class="p-3">${m.area} Ha</td>
+                    <td class="p-3">
+                        <span class="font-semibold text-slate-700">${m.field1}</span>
+                        <br><span class="text-[11px] text-slate-500">${m.field2}</span>
+                    </td>
+                    <td class="p-3 text-slate-500">${m.notes || '-'}</td>
+                    <td class="p-3 text-center">
+                        <button onclick="deleteMaintenance(${m.id})" class="text-red-500 hover:text-red-700 p-1">
+                            <i class="fa-solid fa-trash"></i>
+                        </button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function deleteMaintenance(id) {
+            if (confirm("Hapus catatan perawatan ini?")) {
+                maintenanceRecords = maintenanceRecords.filter(m => m.id !== id);
+                localStorage.setItem('sawitku_maintenances', JSON.stringify(maintenanceRecords));
+                renderMaintenanceTable();
+                updateDashboardStats();
+                showToast("Catatan terhapus", "info");
+            }
+        }
+
+        // UPDATE DASHBOARD STATS
+        function updateDashboardStats() {
+            let totalTon = 0;
+            let totalRevenue = 0;
+
+            harvestRecords.forEach(r => {
+                totalTon += r.totalTon || 0;
+                totalRevenue += r.revenue || 0;
+            });
+
+            const totalArea = currentUser ? currentUser.area : 0;
+            const avgProductivity = totalArea > 0 ? (totalTon / totalArea) : 0;
+
+            document.getElementById('stat-total-ton').innerText = `${totalTon.toFixed(2)} Ton`;
+            document.getElementById('stat-total-income').innerText = `Rp ${totalRevenue.toLocaleString('id-ID')}`;
+            document.getElementById('stat-productivity').innerText = `${avgProductivity.toFixed(2)} Ton/Ha`;
+            document.getElementById('stat-total-maintenance').innerText = `${maintenanceRecords.length} Catatan`;
+
+            // Render Recent 3 Harvests on Dashboard
+            const recentBody = document.getElementById('dashboard-recent-harvest');
+            recentBody.innerHTML = '';
+            const recentList = harvestRecords.slice(0, 3);
+
+            if (recentList.length === 0) {
+                recentBody.innerHTML = `<tr><td colspan="5" class="text-center py-6 text-slate-400">Belum ada catatan panen.</td></tr>`;
+            } else {
+                recentList.forEach(r => {
+                    recentBody.innerHTML += `
+                        <tr class="border-b border-slate-100">
+                            <td class="p-2.5 font-medium">${r.date}</td>
+                            <td class="p-2.5">${r.area} Ha</td>
+                            <td class="p-2.5">${r.bunches} TBS</td>
+                            <td class="p-2.5 font-bold text-sawit-700">${r.totalTon.toFixed(2)} Ton</td>
+                            <td class="p-2.5 font-bold text-emerald-600">Rp ${r.revenue.toLocaleString('id-ID')}</td>
+                        </tr>
+                    `;
+                });
+            }
+        }
+
+        // EXPORT DATA FUNCTIONS
+        function exportToCSV() {
+            if (harvestRecords.length === 0 && maintenanceRecords.length === 0) {
+                showToast("Tidak ada data untuk diekspor!", "warning");
+                return;
+            }
+
+            let csvContent = "data:text/csv;charset=utf-8,";
+            
+            // Harvest Header & Rows
+            csvContent += "=== CATATAN PANEN SAWIT ===\n";
+            csvContent += "Tanggal,Luas Lahan (Ha),Jumlah Tandan (TBS),Rata-rata Berat (Kg),Total Tonase (Ton),Estimasi Pendapatan (Rp)\n";
+            harvestRecords.forEach(r => {
+                csvContent += `${r.date},${r.area},${r.bunches},${r.avgWeight},${r.totalTon},${r.revenue}\n`;
+            });
+
+            csvContent += "\n=== CATATAN PERAWATAN SAWIT ===\n";
+            csvContent += "Kategori,Tanggal,Luas Lahan (Ha),Detail 1,Detail 2,Catatan\n";
+            maintenanceRecords.forEach(m => {
+                csvContent += `${m.category},${m.date},${m.area},"${m.field1}","${m.field2}","${m.notes}"\n`;
+            });
+
+            const encodedUri = encodeURI(csvContent);
+            const link = document.createElement("a");
+            link.setAttribute("href", encodedUri);
+            link.setAttribute("download", `SawitKu_Laporan_${new Date().toISOString().split('T')[0]}.csv`);
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+
+            showToast("Laporan CSV berhasil diunduh!", "success");
+        }
+
+        function exportToJSON() {
+            const dataObj = {
+                user: currentUser,
+                harvests: harvestRecords,
+                maintenances: maintenanceRecords
+            };
+            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(dataObj, null, 2));
+            const downloadAnchor = document.createElement('a');
+            downloadAnchor.setAttribute("href", dataStr);
+            downloadAnchor.setAttribute("download", `SawitKu_Backup_${new Date().toISOString().split('T')[0]}.json`);
+            document.body.appendChild(downloadAnchor);
+            downloadAnchor.click();
+            downloadAnchor.remove();
+
+            showToast("Backup data JSON berhasil diunduh!", "success");
+        }
+
+        // TOAST NOTIFICATION UTILITY
+        function showToast(message, type = "success") {
+            const toast = document.createElement('div');
+            const bgColor = type === 'success' ? 'bg-emerald-600' : type === 'warning' ? 'bg-amber-600' : 'bg-slate-800';
+            toast.className = `${bgColor} text-white text-xs px-4 py-3 rounded-lg shadow-lg flex items-center space-x-2 transition-all transform translate-y-2 opacity-0`;
+            toast.innerHTML = `<i class="fa-solid fa-circle-info"></i><span>${message}</span>`;
+            
+            const container = document.getElementById('toast-container');
+            container.appendChild(toast);
+
+            setTimeout(() => {
+                toast.classList.remove('translate-y-2', 'opacity-0');
+            }, 100);
+
+            setTimeout(() => {
+                toast.classList.add('opacity-0');
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        }
+    </script>
 </body>
 </html>
